@@ -40,15 +40,15 @@ def create_driver():
     options = Options()
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
-    # Uncomment the following line for debugging
+    # Uncomment the following line for headless mode (no GUI)
     # options.add_argument('--headless')
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-    driver.set_page_load_timeout(10)  # Increase the page load timeout
+    driver.set_page_load_timeout(30)  # Increase the page load timeout
     return driver
 
 def send_email(to_email, novel_url, latest_chapter):
     subject = 'Novel Chapter Update'
-    body = 'Master, The novel at {novel_url} has a new chapter: {latest_chapter}'
+    body = f'Master, the novel at {novel_url} has a new chapter: {latest_chapter}'
 
     msg = MIMEMultipart()
     msg['From'] = EMAIL_USERNAME  # Sender's email address
@@ -72,7 +72,7 @@ def check_for_updates():
             try:
                 driver = create_driver()
                 driver.get(novel.url)
-                wait = WebDriverWait(driver, 10)
+                wait = WebDriverWait(driver, 30)
                 
                 latest_chapter_element = wait.until(
                     EC.presence_of_element_located((By.CSS_SELECTOR, 'p.latest.text1row'))
@@ -82,14 +82,16 @@ def check_for_updates():
                 if latest_chapter != novel.latest_chapter:
                     novel.latest_chapter = latest_chapter
                     db.session.commit()
-                    # Send email notification
-                    send_email(novel.email, novel.url, latest_chapter)
+                
+                # Send email notification regardless of whether a new chapter was detected
+                send_email(novel.email, novel.url, latest_chapter)
+                
             except Exception as e:
                 logging.error(f"Error checking updates for {novel.url}: {e}")
             finally:
                 driver.quit()
 
-        time.sleep(3600)
+        time.sleep(1800)  # Check for updates every 30 minutes
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -103,7 +105,7 @@ def index():
         try:
             driver = create_driver()
             driver.get(url)
-            wait = WebDriverWait(driver, 10)
+            wait = WebDriverWait(driver, 30)
             
             latest_chapter_element = wait.until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, 'p.latest.text1row'))
@@ -149,5 +151,5 @@ def get_novels():
     } for novel in novels])
 
 if __name__ == '__main__':
-    threading.Thread(target=check_for_updates).start()
+    threading.Thread(target=check_for_updates, daemon=True).start()
     app.run(debug=True)
