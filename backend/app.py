@@ -10,6 +10,9 @@ from webdriver_manager.chrome import ChromeDriverManager
 import time
 import threading
 import logging
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///novels.db'
@@ -27,6 +30,12 @@ with app.app_context():
 
 logging.basicConfig(level=logging.INFO)
 
+# Email configuration
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USERNAME = 'your_email@gmail.com'
+EMAIL_PASSWORD = 'your_email_password'
+
 def create_driver():
     options = Options()
     options.add_argument('--no-sandbox')
@@ -36,6 +45,25 @@ def create_driver():
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     driver.set_page_load_timeout(10)  # Increase the page load timeout
     return driver
+
+def send_email(to_email, novel_url, latest_chapter):
+    subject = 'Novel Chapter Update'
+    body = f'The novel at {novel_url} has a new chapter: {latest_chapter}'
+
+    msg = MIMEMultipart()
+    msg['From'] = EMAIL_USERNAME
+    msg['To'] = to_email
+    msg['Subject'] = subject
+    msg.attach(MIMEText(body, 'plain'))
+
+    try:
+        with smtplib.SMTP(EMAIL_HOST, EMAIL_PORT) as server:
+            server.starttls()
+            server.login(EMAIL_USERNAME, EMAIL_PASSWORD)
+            server.sendmail(EMAIL_USERNAME, to_email, msg.as_string())
+        logging.info(f'Email sent to {to_email}')
+    except Exception as e:
+        logging.error(f'Failed to send email: {e}')
 
 def check_for_updates():
     while True:
@@ -54,7 +82,8 @@ def check_for_updates():
                 if latest_chapter != novel.latest_chapter:
                     novel.latest_chapter = latest_chapter
                     db.session.commit()
-                    # send_email(novel.email, latest_chapter)
+                    # Send email notification
+                    send_email(novel.email, novel.url, latest_chapter)
             except Exception as e:
                 logging.error(f"Error checking updates for {novel.url}: {e}")
             finally:
