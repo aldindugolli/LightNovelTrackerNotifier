@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novel Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Novel Tracker</h1>
+    </header>
+
+    <main>
+        <section class="form-section">
+            <h2>Add New Novel</h2>
+            <form action="/" method="POST">
+                <label for="url">Novel URL:</label>
+                <input type="text" id="url" name="url" required placeholder="Enter the novel URL">
+
+                <label for="email">Your Email:</label>
+                <input type="email" id="email" name="email" required placeholder="Enter your email">
+
+                <button type="submit">Add Novel</button>
+            </form>
+        </section>
+
+        <section class="novels-section">
+            <h2>Your Novels</h2>
+            <ul>
+                {% for novel in novels %}
+                <li>
+                    <div class="novel-info">
+                        <p><strong>URL:</strong> {{ novel.url }}</p>
+                        <p><strong>Latest Chapter:</strong> {{ novel.latest_chapter }}</p>
+                        <form action="{{ url_for('remove') }}" method="POST">
+                            <input type="hidden" name="url" value="{{ novel.url }}">
+                            <button type="submit" class="remove-btn">Remove</button>
+                        </form>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Novel Tracker. All rights reserved.</p>
+    </footer>
+</body>
+</html>

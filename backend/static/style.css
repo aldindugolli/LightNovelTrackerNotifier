@@ -1,0 +1,97 @@
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    color: #ffffff;
+    background-color: #000000;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #1a1a1a;
+    padding: 1rem;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    color: #ffffff;
+}
+
+main {
+    padding: 2rem;
+}
+
+.form-section, .novels-section {
+    margin-bottom: 2rem;
+}
+
+form {
+    background-color: #1a1a1a;
+    padding: 1rem;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #cccccc;
+}
+
+input[type="text"], input[type="email"] {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #333333;
+    border-radius: 5px;
+    background-color: #333333;
+    color: #ffffff;
+}
+
+button {
+    background-color: #555555;
+    color: #ffffff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #777777;
+}
+
+.novels-section ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.novels-section li {
+    background-color: #1a1a1a;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.novel-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.remove-btn {
+    background-color: #ff4c4c;
+}
+
+.remove-btn:hover {
+    background-color: #ff0000;
+}
+
+footer {
+    background-color: #1a1a1a;
+    color: #cccccc;
+    padding: 1rem;
+    text-align: center;
+}
