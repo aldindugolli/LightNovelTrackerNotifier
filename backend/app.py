@@ -48,7 +48,7 @@ def create_driver():
 
 def send_email(to_email, novel_url, latest_chapter):
     subject = 'Novel Chapter Update'
-    body = f'The novel at {novel_url} has a new chapter: {latest_chapter}'
+    body = 'Master, The novel at {novel_url} has a new chapter: {latest_chapter}'
 
     msg = MIMEMultipart()
     msg['From'] = EMAIL_USERNAME  # Sender's email address
