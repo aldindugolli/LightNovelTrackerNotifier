@@ -31,10 +31,10 @@ with app.app_context():
 logging.basicConfig(level=logging.INFO)
 
 # Email configuration
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USERNAME = 'your_email@gmail.com'
-EMAIL_PASSWORD = 'your_email_password'
+EMAIL_HOST = 'smtp.gmail.com'  # Change this if you are using a different SMTP server
+EMAIL_PORT = 587  # Port number for SMTP
+EMAIL_USERNAME = 'shadowmonarchnightcore@gmail.com'  # Replace with your email address
+EMAIL_PASSWORD = 'WebScraper112'  # Replace with your email password
 
 def create_driver():
     options = Options()
@@ -51,16 +51,16 @@ def send_email(to_email, novel_url, latest_chapter):
     body = f'The novel at {novel_url} has a new chapter: {latest_chapter}'
 
     msg = MIMEMultipart()
-    msg['From'] = EMAIL_USERNAME
-    msg['To'] = to_email
+    msg['From'] = EMAIL_USERNAME  # Sender's email address
+    msg['To'] = to_email  # Recipient's email address
     msg['Subject'] = subject
     msg.attach(MIMEText(body, 'plain'))
 
     try:
         with smtplib.SMTP(EMAIL_HOST, EMAIL_PORT) as server:
             server.starttls()
-            server.login(EMAIL_USERNAME, EMAIL_PASSWORD)
-            server.sendmail(EMAIL_USERNAME, to_email, msg.as_string())
+            server.login(EMAIL_USERNAME, EMAIL_PASSWORD)  # Log in to the SMTP server
+            server.sendmail(EMAIL_USERNAME, to_email, msg.as_string())  # Send the email
         logging.info(f'Email sent to {to_email}')
     except Exception as e:
         logging.error(f'Failed to send email: {e}')
