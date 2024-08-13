@@ -10,9 +10,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 import time
 import threading
 import logging
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+from sparkpost import SparkPost
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///novels.db'
@@ -30,11 +28,11 @@ with app.app_context():
 
 logging.basicConfig(level=logging.INFO)
 
-# Email configuration
-EMAIL_HOST = 'smtp.gmail.com'  # Change this if you are using a different SMTP server
-EMAIL_PORT = 587  # Port number for SMTP
-EMAIL_USERNAME = 'shadowmonarchnightcore@gmail.com'  # Replace with your email address
-EMAIL_PASSWORD = 'WebScraper112'  # Replace with your email password
+# SparkPost configuration
+SPARKPOST_API_KEY = '82e75d96df11e7a630b5e9b360a21f2f6079b49f'  # Replace with your SparkPost API key
+SPARKPOST_SENDER_EMAIL = 'your-email@example.com'  # Replace with your sender email address
+
+sp = SparkPost(SPARKPOST_API_KEY)
 
 def create_driver():
     options = Options()
@@ -48,20 +46,16 @@ def create_driver():
 
 def send_email(to_email, novel_url, latest_chapter):
     subject = 'Novel Chapter Update'
-    body = 'Master, The novel at {novel_url} has a new chapter: {latest_chapter}'
-
-    msg = MIMEMultipart()
-    msg['From'] = EMAIL_USERNAME  # Sender's email address
-    msg['To'] = to_email  # Recipient's email address
-    msg['Subject'] = subject
-    msg.attach(MIMEText(body, 'plain'))
+    body = f'Master, The novel at {novel_url} has a new chapter: {latest_chapter}'
 
     try:
-        with smtplib.SMTP(EMAIL_HOST, EMAIL_PORT) as server:
-            server.starttls()
-            server.login(EMAIL_USERNAME, EMAIL_PASSWORD)  # Log in to the SMTP server
-            server.sendmail(EMAIL_USERNAME, to_email, msg.as_string())  # Send the email
-        logging.info(f'Email sent to {to_email}')
+        response = sp.transmissions.send(
+            recipients=[to_email],
+            html=body,
+            from_email=SPARKPOST_SENDER_EMAIL,
+            subject=subject
+        )
+        logging.info(f'Email sent to {to_email} with response: {response}')
     except Exception as e:
         logging.error(f'Failed to send email: {e}')
 
@@ -89,7 +83,7 @@ def check_for_updates():
             finally:
                 driver.quit()
 
-        time.sleep(3600)
+        time.sleep(1800)  # Check every 30 minutes
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
